@@ -1,147 +1,5 @@
 open System.IO
 
-exception SYNTAX_ERROR of string
-
-// type EType = 
-//     | character = 0
-//     | dot = 1
-//     | brackets = 2
-//     | other = 3
-
-// type Element = {Type: EType; mutable repeat: bool; mutable isopen: bool; elements: Element[][]; depth: int; value : char}
-
-// let mutable depth = 0
-// let mutable current = 0
-// let mutable baseE: Element array = Array.empty
-// let mutable targetChars = Array.empty
-
-// let rec closeBrackets (e: Element, depth: int, repeat:bool) =
-//     if e.Type.Equals EType.brackets then
-//         if e.depth.Equals depth then
-//             e.isopen <- false
-//             e.repeat <- repeat
-//         else 
-//             let lastValue = e.elements.[0].[e.elements.[0].Length - 1]
-//             closeBrackets(lastValue,depth,repeat)
-//     else 
-//         let inArray = e.elements.[e.elements.Length-1]
-//         closeBrackets(inArray.[inArray.Length-1], depth,repeat)
-       
-// let isNested: bool = 
-//     if baseE.Length > 0 then baseE.[baseE.Length-1].isopen else false
-
-// let addOther(e:Element) =
-//     printfn "TODO??"
-
-// // // let run (expression, target) = null
-
-// let rec addElement (outerElement: Element, e: Element) =
-//     if e.Type.Equals EType.brackets then
-//         if outerElement.elements.[0].[outerElement.elements.[0].Length - 1].isopen then 
-//             addElement(outerElement.elements.[0].[outerElement.elements.[0].Length - 1],e)
-//         else
-//             outerElement.elements.[0].[outerElement.elements.[0].Length] <- e
-//     else 
-//         let lastValue = outerElement.elements.[outerElement.elements.[0].Length - 1]
-//         if lastValue.[lastValue.Length - 1].isopen then
-//             addElement(lastValue.[lastValue.Length - 1],e)
-//         else
-//             lastValue.[lastValue.Length] <- e
-
-// let evaluateDot (e : Element, characters: char[]) : bool =
-//     if targetChars.Length = 0  then false
-//     else 
-//         targetChars <- Array.tail targetChars
-//         true
-        
-// let evaluateChar (e : Element, characters: char[]) : bool =
-//     if targetChars.Length = 0  then false
-//     else 
-//         if e.repeat then
-//             while targetChars.[0].Equals e.value do 
-//                 targetChars <- Array.tail targetChars
-//             true 
-//         else if targetChars.[0].Equals e.value then 
-//             targetChars <- Array.tail targetChars
-//             true
-            
-//         else 
-//             false  
-
-// let evaluateBrackets (e : Element, characters: char[]) : bool =
-//     false
-
-// let evaluateOther (e : Element, characters: char[]) : bool =
-//     false
-
-// let compareTarget (target : string) : string =
-//     let mutable targetC = target.ToCharArray()
-//     let comparing = Array.forall(fun (e : Element) ->
-//         match e.Type with
-//             | EType.dot -> evaluateDot(e,targetC)
-//             | EType.character -> evaluateChar(e,targetC)
-//             | EType.brackets -> evaluateOther(e,targetC)
-//             | EType.other -> evaluateOther(e,targetC)
-//             | _ -> false
-//     )
-//     if comparing baseE && Array.isEmpty targetChars then
-//         "YES"
-//     else
-//         "NO"       
-
-
-// let createElement (c : char, repeat: bool) : Option<Element> =
-//     match c with 
-//         | '.' -> Some {Type = EType.dot; repeat = repeat; isopen = false; elements = null; depth = depth; value = c}
-//         | '|' ->
-//             if isNested then 
-//                 addOther(baseE.[baseE.Length])
-//                 None
-//             else
-//                 let otherE: Element[][] = Array.empty
-//                 let prev: Element array = Array.copy baseE: Element[]
-//                 otherE.[0] <- prev
-//                 otherE.[1] <- Array.empty
-//                 baseE <- Array.empty
-//                 Some {Type = EType.other; repeat = repeat; isopen = true; elements = otherE; depth = depth; value = c}
-//         | '(' ->
-//             if repeat then raise (SYNTAX_ERROR("SYNTAX ERROR"))
-//             depth <- depth + 1
-//             let mutable em = Array.zeroCreate<Element> 2
-//             let r = em.[0]
-//             let e = {Type = EType.dot; repeat = repeat; isopen = false; elements = null; depth = depth; value = c}
-//             em <- Array.append em [|e|]
-//             printfn "G"
-//             let bracketsE: Element[][] = Array2D.zeroCreate<Element> 2 1
-//             bracketsE.[0] <- Array.empty
-//             printfn "H"
-//             Some {Type = EType.brackets; repeat = repeat; isopen = true; elements = bracketsE; depth = depth; value = c}
-//         | ')' ->
-//             printfn "%A" baseE
-//             if depth.Equals 0 then raise (SYNTAX_ERROR("SYNTAX ERROR"))
-//             closeBrackets(baseE.[baseE.Length-1], depth, repeat)
-//             depth <- depth - 1
-//             None
-//         |_ -> 
-//             Some {Type = EType.character; repeat = repeat; isopen = false; elements = null; depth = depth; value = c}
-
-// let readExpression (characters : char[]) =
-//     let char = characters.[current]
-//     let next = if current < characters.Length-1 then characters.[current+1] else ' '
-//     current <- current + 1
-
-//     if char.Equals '*' then raise (SYNTAX_ERROR("SYNTAX ERROR"))
-//     let mutable repeat = false
-//     if next.Equals '*' then
-//         if char.Equals '|' then raise (SYNTAX_ERROR("SYNTAX ERROR"))
-//         repeat <- true
-//         current <- current + 1
-//     let e = createElement(char, repeat)
-//     if not e.IsNone then    
-//         if isNested then    
-//             addElement(baseE.[baseE.Length-1], e.Value)
-//         else 
-//             baseE <- Array.append baseE [|e.Value|]
 
 type ExpressionTree =
     | CharValue of char * ExpressionTree
@@ -201,7 +59,6 @@ let rec parseExpression (expression : char[]) : ExpressionTree =
                         let half = Array.tail expression
                         let t = Array.tail half
                         let n = parseExpression(t)
-                        //let e = End("end")
                         Star(c,l,n)
                     |_ -> 
                         match c with
@@ -231,8 +88,6 @@ let rec parseExpression (expression : char[]) : ExpressionTree =
 let rec matchExpression (expression: ExpressionTree, target : char[]) : bool =
     match expression with
     | End(v) -> 
-        // printfn "End"
-        //if target.Length = 0 then printfn "true" else printfn "false" 
         target.Length = 0
     |_ ->
         match expression with 
@@ -240,12 +95,9 @@ let rec matchExpression (expression: ExpressionTree, target : char[]) : bool =
                 if target.Length = 0 then false 
                 else
                     let f = target.[0]
-                    // printfn "%c" v
-                    // printfn "%c" f
                     let mat = v.Equals f
                     let t = Array.tail target
                     let r = matchExpression(nex,t)
-                    // if r then printfn "true" else printfn "false" 
                     mat && r
             | Dot(v, nex) -> 
                 if target.Length = 0 then false 
@@ -265,22 +117,14 @@ let rec matchExpression (expression: ExpressionTree, target : char[]) : bool =
                         let r = matchExpression(nex,t)  
                         r
                     | Dot(cv,cnext) -> 
-                        // while t.Length > 0 && t.[0]. Equals cv do 
-                        //     t <- Array.tail t  
-                        // let r = matchExpression(nex,t)  
-                        // r
                         true
                     |_ -> false               
             | Brackets(v, nex) -> 
-                // if target.Length = 0 then false
-                // else
-                //     //printfn "Brace"
                 let r = matchExpression(v,target)
                 r
             | Line(v,left,right, nex) ->
                 let l = matchExpression(left,target)
                 let r = matchExpression(right,target)
-                // "Line"
                 l || r
             | Syn(v) -> false
             | End(v) -> true
@@ -332,26 +176,16 @@ let runExpression (expression : string,target : string ) : string =
         else 
             "NO"
 
-printfn "Testing"
 let args = fsi.CommandLineArgs
 if args.Length <> 3 then failwith "Incorrect arguments"
-// printfn "%A" args
-// printfn "%s" args.[1]
 try 
     let exName = args.[1]
     let tarName = args.[2]
     let expressionLines = File.ReadAllLines(exName)
     let targetLines = File.ReadAllLines(tarName)
-    // printfn "%s" expressionLines.[1]
-    // printfn "%i" targetLines.Length
     for i = 0 to expressionLines.Length - 1 do
-        //printfn "Expression: %s Target: %s" expressionLines.[i] targetLines.[i]
-        // current <- 0
-        // depth <- 0
-        // baseE <- Array.empty
         let mutable expression = expressionLines.[i]
         let mutable target = targetLines.[i]
-        // targetChars <- target.ToCharArray()
         let r = runExpression(expression, target)
         printfn "%s" r
 with ex ->
