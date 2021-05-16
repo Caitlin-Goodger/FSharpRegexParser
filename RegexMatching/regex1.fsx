@@ -1,16 +1,16 @@
 open System.IO
 
-
+//Different Types of symbols supported
 type ExpressionTree =
     | CharValue of char * ExpressionTree
     | Line of char * ExpressionTree * ExpressionTree * ExpressionTree
     | Dot of char * ExpressionTree
     | Star of char * ExpressionTree * ExpressionTree
     | Brackets of ExpressionTree * ExpressionTree
-    | Syn of char
     | End of string 
 
-
+//Parse the expression given
+//Match the symbol read with symbols the project supports
 let rec parseExpression (expression : char[]) : ExpressionTree = 
     let conOr = Array.contains '|' expression
     if conOr then 
@@ -85,6 +85,7 @@ let rec parseExpression (expression : char[]) : ExpressionTree =
                                 let n = parseExpression(t)
                                 CharValue(c,n)
 
+//Match the expression with the target by moving through the tree
 let rec matchExpression (expression: ExpressionTree, target : char[]) : bool =
     match expression with
     | End(v) -> 
@@ -126,9 +127,9 @@ let rec matchExpression (expression: ExpressionTree, target : char[]) : bool =
                 let l = matchExpression(left,target)
                 let r = matchExpression(right,target)
                 l || r
-            | Syn(v) -> false
             | End(v) -> true
  
+ // Count the number of brackets to make sure it is a valid expression
 let countBrackets(expression : char[]) : bool =
     let mutable numBrack = 0 
     for i = 0 to expression.Length - 1 do
@@ -141,6 +142,7 @@ let countBrackets(expression : char[]) : bool =
             numBrack <- numBrack
     numBrack <> 0
 
+//Checks that the astericks come after a valid symbol
 let checkStars (expression : char[]) : bool =
     let mutable stars = false
     for i = 1 to expression.Length - 1 do
@@ -155,7 +157,7 @@ let checkStars (expression : char[]) : bool =
                 stars <- stars
     stars
 
- 
+ // Find any expression with invalid syntax
 let findSyntaxErrors(expression : char[]) : bool = 
     let numbrack = countBrackets(expression) 
     let f = expression.[0]
@@ -163,6 +165,7 @@ let findSyntaxErrors(expression : char[]) : bool =
     let stars = checkStars(expression)
     numbrack || firstStar || stars
 
+//Parsing the expression then comparing it to the target
 let runExpression (expression : string,target : string ) : string = 
     let mutable characters = expression.ToCharArray()
     let mutable targetchars = target.ToCharArray()
